@@ -1,31 +1,47 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
-    id("java")
+    id("base")
 }
 
-group = "edu.io"
-version = "1.0-SNAPSHOT"
+val versionMajor: String by project
+val versionMinor: String by project
+val versionBuild = gitCommitCount()
 
-repositories {
-    mavenCentral()
-}
+version = "$versionMajor.$versionMinor.$versionBuild"
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+allprojects {
+    group = "edu.io.net"
+    version = rootProject.version
+
+    tasks.withType<Jar> {
+        manifest {
+            attributes(
+                "Implementation-Title" to project.name,
+                "Implementation-Version" to project.version
+            )
+        }
     }
 }
-tasks.withType<JavaCompile> {
-    options.release.set(21)
-}
 
-dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+println("Building version: $version")
 
-    implementation("org.jetbrains:annotations:26.0.2")
-}
+fun gitCommitCount(): Int {
+    val tag = ByteArrayOutputStream().also { out ->
+        exec {
+            commandLine("git", "describe", "--tags", "--abbrev=0")
+            standardOutput = out
+            isIgnoreExitValue = true
+        }
+    }.toString().trim()
 
-tasks.test {
-    useJUnitPlatform()
+    if (tag.isBlank()) return 0
+
+    val stdout = ByteArrayOutputStream()
+    exec {
+        commandLine("git", "rev-list", "--count", "$tag..HEAD")
+        standardOutput = stdout
+        isIgnoreExitValue = true
+    }
+    return stdout.toString().trim().toIntOrNull() ?: 0
 }

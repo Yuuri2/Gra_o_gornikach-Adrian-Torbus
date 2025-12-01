@@ -1,0 +1,9 @@
+pages:
+  stage: deploy
+  script:
+    - echo "Publishing javadoc"
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
