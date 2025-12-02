@@ -1,5 +1,12 @@
 plugins {
     id("java")
+    id("application")
+}
+
+val mainClassName = "edu.io.net.Main"
+
+application {
+    mainClass.set(mainClassName)
 }
 
 group = "edu.io.net"
