@@ -1,47 +1,22 @@
-import java.io.ByteArrayOutputStream
-
 plugins {
-    id("base")
+    id("java")
 }
 
-val versionMajor: String by project
-val versionMinor: String by project
-val versionBuild = gitCommitCount()
+group = "edu.io.net"
+version = "1.0-SNAPSHOT"
 
-version = "$versionMajor.$versionMinor.$versionBuild"
-
-allprojects {
-    group = "edu.io.net"
-    version = rootProject.version
-
-    tasks.withType<Jar> {
-        manifest {
-            attributes(
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version
-            )
-        }
-    }
+repositories {
+    mavenCentral()
 }
 
-println("Building version: $version")
+dependencies {
+    implementation(fileTree("libs"))
 
-fun gitCommitCount(): Int {
-    val tag = ByteArrayOutputStream().also { out ->
-        exec {
-            commandLine("git", "describe", "--tags", "--abbrev=0")
-            standardOutput = out
-            isIgnoreExitValue = true
-        }
-    }.toString().trim()
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
 
-    if (tag.isBlank()) return 0
-
-    val stdout = ByteArrayOutputStream()
-    exec {
-        commandLine("git", "rev-list", "--count", "$tag..HEAD")
-        standardOutput = stdout
-        isIgnoreExitValue = true
-    }
-    return stdout.toString().trim().toIntOrNull() ?: 0
+tasks.test {
+    useJUnitPlatform()
 }

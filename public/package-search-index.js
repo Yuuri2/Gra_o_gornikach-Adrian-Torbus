@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"edu.io.net"},{"l":"edu.io.net.command"},{"l":"edu.io.net.server"},{"l":"edu.io.net.server.gameplay"},{"l":"edu.io.net.server.tcp"}];updateSearchResults();
